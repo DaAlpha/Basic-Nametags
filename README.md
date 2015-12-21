@@ -1,2 +1,1 @@
-# Basic-Nametags
-Pretty much the most simplistic nametags ever for JC2MP.
+For more information about this script, go to https://www.jc-mp.com/forums/index.php/topic,5811.0.html
