@@ -7,8 +7,10 @@ function Nametags:__init()
 	self.barHeight	= 2		-- px (Default: 2)
 	self.maxHealth	= Color(20, 220, 20)
 	self.minHealth	= Color(200, 80, 20)
+	self.command	= "/minimap"
 
 	-- Objects
+	self.miniblips	= true
 	self.positions	= {}
 
 	-- Network
@@ -16,6 +18,7 @@ function Nametags:__init()
 
 	-- Events
 	Events:Subscribe("Render", self, self.Render)
+	Events:Subscribe("LocalPlayerChat", self, self.LocalPlayerChat)
 end
 
 function Nametags:PlayerPositions(positions)
@@ -66,14 +69,32 @@ function Nametags:Render()
 		streamed[p:GetId()] = true
 	end
 
-	for id, data in pairs(self.positions) do
-		if not streamed[id] then
-			local mapPos = Render:WorldToMinimap(data.pos)
+	if self.miniblips then
+		for id, data in pairs(self.positions) do
+			if not streamed[id] then
+				local mapPos = Render:WorldToMinimap(data.pos)
 
-			Render:FillCircle(mapPos, 5, Color(0, 0, 0, 180))
-			Render:FillCircle(mapPos, 4, data.color)
+				Render:FillCircle(mapPos, 5, Color(0, 0, 0, 180))
+				Render:FillCircle(mapPos, 4, data.color)
+			end
 		end
 	end
+end
+
+function Nametags:LocalPlayerChat(args)
+	if args.text:lower() ~= self.command then return end
+
+	local state = not self.miniblips
+
+	self.miniblips = state
+	Network:Send("ToggleMinimap", state)
+
+	if state then
+		Chat:Print("Minimap blips enabled.", Color.Lime)
+	else
+		Chat:Print("Minimap blips disabled.", Color.Red)
+	end
+	return false
 end
 
 local nametags = Nametags()
