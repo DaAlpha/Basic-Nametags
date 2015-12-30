@@ -13,17 +13,9 @@ function Nametags:__init()
 	self.miniblips	= true
 	self.positions	= {}
 
-	-- Network
-	Network:Subscribe("PlayerPositions", self, self.PlayerPositions)
-
 	-- Events
 	Events:Subscribe("Render", self, self.Render)
 	Events:Subscribe("LocalPlayerChat", self, self.LocalPlayerChat)
-end
-
-function Nametags:PlayerPositions(positions)
-	positions[LocalPlayer:GetId()] = nil
-	self.positions = positions
 end
 
 function Nametags:Render()
@@ -32,12 +24,14 @@ function Nametags:Render()
 	local localPos	= LocalPlayer:GetPosition()
 	local streamed	= {}
 
+	-- Draw streamed players
 	for p in Client:GetStreamedPlayers() do
 		local pos3		= p:GetBonePosition("ragdoll_Head") + Vector3(0, 0.3, 0)
 		local color		= p:GetColor()
 		local mapPos	= Render:WorldToMinimap(pos3)
 		local pos, onsc	= Render:WorldToScreen(pos3)
 
+		-- Minimap
 		Render:FillCircle(mapPos, 6, Color(0, 0, 0, 180))
 		Render:FillCircle(mapPos, 5, color)
 
@@ -56,12 +50,14 @@ function Nametags:Render()
 			local barColor	= math.lerp(self.minHealth, self.maxHealth, health ^ 2)
 			barColor.a		= alpha
 
+			-- Healthbar
 			Render:FillArea(barPos - Vector2(1, 1), barSize + Vector2(2, 2), sColor)
 			Render:FillArea(barPos, Vector2(barSize.x * health, barSize.y), barColor)
 
-			local textPos	= pos - Vector2(nameSize.x / 2, self.barHeight + nameSize.y + 1)
+			local textPos	= pos - Vector2(nameSize.x / 2 + 1, self.barHeight + nameSize.y + 1)
 			color.a			= alpha
 
+			-- Name
 			Render:DrawText(textPos + Vector2(1, 1), name, sColor, self.textSize, scale)
 			Render:DrawText(textPos, name, color, self.textSize, scale)
 		end
@@ -69,13 +65,14 @@ function Nametags:Render()
 		streamed[p:GetId()] = true
 	end
 
+	-- Draw non-streamed minimap blips
 	if self.miniblips then
-		for id, data in pairs(self.positions) do
-			if not streamed[id] then
-				local mapPos = Render:WorldToMinimap(data.pos)
+		for p in Client:GetPlayers() do
+			if not streamed[p:GetId()] and p:GetValue("Position") then
+				local mapPos = Render:WorldToMinimap(p:GetValue("Position"))
 
 				Render:FillCircle(mapPos, 5, Color(0, 0, 0, 180))
-				Render:FillCircle(mapPos, 4, data.color)
+				Render:FillCircle(mapPos, 4, p:GetColor())
 			end
 		end
 	end
@@ -84,12 +81,11 @@ end
 function Nametags:LocalPlayerChat(args)
 	if args.text:lower() ~= self.command then return end
 
-	local state = not self.miniblips
+	self.miniblips = not self.miniblips
 
-	self.miniblips = state
-	Network:Send("ToggleMinimap", state)
+	Network:Send("ToggleMinimap", self.miniblips)
 
-	if state then
+	if self.miniblips then
 		Chat:Print("Minimap blips enabled.", Color.Lime)
 	else
 		Chat:Print("Minimap blips disabled.", Color.Red)
