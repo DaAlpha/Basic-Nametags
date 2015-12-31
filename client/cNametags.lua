@@ -21,8 +21,7 @@ end
 function Nametags:Render()
 	if Game:GetState() ~= GUIState.Game then return end
 
-	local localPos	= LocalPlayer:GetPosition()
-	local streamed	= {}
+	local localPos = LocalPlayer:GetPosition()
 
 	-- Draw streamed players
 	for p in Client:GetStreamedPlayers() do
@@ -61,14 +60,12 @@ function Nametags:Render()
 			Render:DrawText(textPos + Vector2(1, 1), name, sColor, self.textSize, scale)
 			Render:DrawText(textPos, name, color, self.textSize, scale)
 		end
-
-		streamed[p:GetId()] = true
 	end
 
 	-- Draw non-streamed minimap blips
 	if self.miniblips then
 		for p in Client:GetPlayers() do
-			if not streamed[p:GetId()] and p:GetValue("Position") then
+			if not IsValid(p, true) and p:GetValue("Position") then
 				local mapPos = Render:WorldToMinimap(p:GetValue("Position"))
 
 				Render:FillCircle(mapPos, 5, Color(0, 0, 0, 180))
