@@ -31,4 +31,4 @@ function Nametags:PostTick()
   end
 end
 
-local nametags = Nametags()
+Nametags()

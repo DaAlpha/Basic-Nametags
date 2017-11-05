@@ -91,4 +91,4 @@ function Nametags:LocalPlayerChat(args)
   return false
 end
 
-local nametags = Nametags()
+Nametags()
