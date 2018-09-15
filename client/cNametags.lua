@@ -11,7 +11,6 @@ function Nametags:__init()
 
   -- Objects
   self.miniblips  = true
-  self.positions  = {}
 
   -- Events
   Events:Subscribe("Render", self, self.Render)
