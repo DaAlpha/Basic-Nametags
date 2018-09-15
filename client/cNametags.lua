@@ -83,9 +83,9 @@ function Nametags:LocalPlayerChat(args)
   Network:Send("ToggleMinimap", self.miniblips)
 
   if self.miniblips then
-    Chat:Print("Minimap blips enabled.", Color.Lime)
+    Chat:Print("Global minimap blips enabled.", Color.Lime)
   else
-    Chat:Print("Minimap blips disabled.", Color.Red)
+    Chat:Print("Global minimap blips disabled.", Color.Red)
   end
   return false
 end
