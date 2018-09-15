@@ -14,6 +14,8 @@ function Nametags:__init()
 
   -- Events
   Events:Subscribe("Render", self, self.Render)
+  Events:Subscribe("ModuleLoad", self, self.ModuleLoad)
+  Events:Subscribe("ModuleUnload", self, self.ModuleUnload)
   Events:Subscribe("LocalPlayerChat", self, self.LocalPlayerChat)
 end
 
@@ -73,6 +75,22 @@ function Nametags:Render()
       end
     end
   end
+end
+
+function Nametags:ModuleLoad()
+  Events:Fire("HelpAddItem", {
+    name = "Nametags",
+    text =
+      "Type " .. self.command .. " in chat to disable global minimap blips for youself.\n \n" ..
+      "Players with disabled global blips can not be seen on another player's minimap " ..
+      "if they are outside of their stream distance (500m by default). At the same time, " ..
+      "they can not see anybody on their minimap who is outside of their own stream distance.\n \n" ..
+      "Basic Nametags (public version) by DaAlpha, creator and owner of Alpha's Salt Factory"
+  })
+end
+
+function Nametags:ModuleUnload()
+  Events:Fire("HelpRemoveItem", {name = "Nametags"})
 end
 
 function Nametags:LocalPlayerChat(args)
